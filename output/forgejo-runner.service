@@ -1,0 +1,24 @@
+[Unit]
+Description=Forgejo Runner
+Documentation=https://forgejo.org/docs/latest/admin/actions/
+After=network.target
+###
+# Uncomment if jobs are executed with the docker executor
+###
+#Wants=docker.service
+#After=docker.service
+
+[Service]
+# This user and directories are created by the package's postinst script
+User=forgejo-runner
+Group=forgejo-runner
+WorkingDirectory=/var/lib/forgejo-runner
+ExecStart=/usr/bin/forgejo-runner daemon --config /etc/forgejo-runner/config.yml
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=10
+# allow configured shutdown_timeout to be effective, rather than overridden by systemd
+TimeoutStopSec=infinity
+
+[Install]
+WantedBy=multi-user.target

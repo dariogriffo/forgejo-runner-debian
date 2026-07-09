@@ -1,0 +1,16 @@
+Source: forgejo-runner
+Section: net
+Priority: optional
+Maintainer: Dario Griffo <dariogriffo@gmail.com>
+Build-Depends: debhelper-compat (= 13), wget, ca-certificates
+Standards-Version: 4.6.2
+Homepage: https://code.forgejo.org/forgejo/runner
+Rules-Requires-Root: no
+
+Package: forgejo-runner
+Architecture: amd64 arm64
+Depends: ${misc:Depends}, adduser
+Description: Runner for Forgejo Actions
+ forgejo-runner is the task runner for Forgejo Actions, the CI/CD
+ system built into Forgejo. It registers against a Forgejo instance
+ and executes the workflow jobs it is assigned.

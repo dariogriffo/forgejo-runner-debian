@@ -48,30 +48,42 @@ sudo dpkg -i <filename>.deb
 
 To update to a new version, just follow any of the installation methods above. There's no need to uninstall the old version; it will be updated correctly.
 
-## Building
+## Post-installation
 
-**Status: not implemented yet.** The build scripts in this repository are currently stubs
-(see `build.sh`, `build_debian.sh`, `build_ubuntu.sh`, `build_src.sh`) and will exit
-non-zero until the forgejo-runner packaging logic is implemented.
+After installing the package, register the runner against your Forgejo instance:
+
+```sh
+sudo -u forgejo-runner forgejo-runner register --config /etc/forgejo-runner/config.yml \
+  --no-interactive --instance <https://your-forgejo-instance> --token <registration-token>
+sudo systemctl start forgejo-runner
+sudo systemctl enable forgejo-runner
+```
+
+The package automatically:
+- Creates the `forgejo-runner` system user and group
+- Creates `/var/lib/forgejo-runner` (work directory, owned by `forgejo-runner:forgejo-runner`, mode `750`)
+- Creates `/etc/forgejo-runner` (config directory, owned by `root:forgejo-runner`, mode `770`)
+- Installs the systemd service file
+
+## Building
 
 ### Build for single architecture
 ```sh
 ./build.sh <forgejo_runner_version> <build_version> <architecture>
-# Example: ./build.sh 1.2.3 1 arm64
+# Example: ./build.sh 12.13.0 1 arm64
 ```
 
 ### Build for all architectures
 ```sh
 ./build.sh <forgejo_runner_version> <build_version> all
-# Example: ./build.sh 1.2.3 1 all
+# Example: ./build.sh 12.13.0 1 all
 ```
 
 ## Roadmap
 
-- [ ] Implement build scripts (forgejo-runner is not yet packaged)
-- [ ] Produce a .deb package on GitHub Releases
+- [x] Produce a .deb package on GitHub Releases
+- [x] Multi-architecture support (amd64, arm64)
 - [ ] Set up a debian mirror for easier updates
-- [ ] Multi-architecture support (amd64, arm64)
 
 ## Disclaimer
 

@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+# Create forgejo-runner group if it doesn't exist
+if ! getent group forgejo-runner > /dev/null 2>&1; then
+    addgroup --system forgejo-runner
+fi
+
+# Create forgejo-runner user if it doesn't exist
+if ! id -u forgejo-runner > /dev/null 2>&1; then
+    adduser --system --shell /usr/sbin/nologin --gecos 'Forgejo Runner' \
+        --ingroup forgejo-runner --disabled-password --home /var/lib/forgejo-runner forgejo-runner
+fi
+
+# Create work/data directory
+if [ ! -d /var/lib/forgejo-runner ]; then
+    mkdir -p /var/lib/forgejo-runner
+fi
+chown forgejo-runner:forgejo-runner /var/lib/forgejo-runner
+chmod 750 /var/lib/forgejo-runner
+
+# Create config directory
+if [ ! -d /etc/forgejo-runner ]; then
+    mkdir -p /etc/forgejo-runner
+fi
+chown root:forgejo-runner /etc/forgejo-runner
+chmod 770 /etc/forgejo-runner
+
+# Reload systemd so the new service file is recognized
+if command -v systemctl > /dev/null 2>&1 && systemctl is-system-running --quiet 2>/dev/null; then
+    systemctl daemon-reload || true
+fi
+
+echo "forgejo-runner installed. To complete setup:"
+echo "  1. Register against your Forgejo instance:"
+echo "     sudo -u forgejo-runner forgejo-runner register --config /etc/forgejo-runner/config.yml \\"
+echo "       --no-interactive --instance <https://your-forgejo-instance> --token <registration-token>"
+echo "  2. Start the service: sudo systemctl start forgejo-runner"
+echo "  3. Enable on boot: sudo systemctl enable forgejo-runner"
+
+exit 0
